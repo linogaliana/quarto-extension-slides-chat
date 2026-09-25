@@ -31,7 +31,7 @@ If you want to see real examples:
 ## Installation
 
 ```bash
-quarto add linogaliana/quarto-extension-slides-chat
+quarto add linogaliana/slides-chat
 ```
 
 This installs the extension under `_extensions/slides-chat/`. Commit that folder along with your project.
