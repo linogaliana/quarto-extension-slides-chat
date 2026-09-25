@@ -8,6 +8,10 @@ styled like a command-line agent:
 - the AI "thinks" (typing dots, blinking logo), then its answer streams in word by word, while code blocks and images fade in;
 - every message is a fragment, so you step forward and back with the arrow keys.
 
+![Demo of slides-chat](media/demo.gif)
+
+A [longer video](media/demo.mp4) walks through every example slide.
+
 ## Installation
 
 ```bash
