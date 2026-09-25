@@ -2,7 +2,7 @@
 
 Walks through every chat slide of example.html fragment by fragment, waiting
 for each AI answer to finish streaming, then writes media/demo.mp4 and a short
-media/demo.gif (title + first conversation) for the README.
+media/demo.gif (title + first conversation) for the README, plus media/demo-full.gif (the whole walkthrough).
 
 Requirements: `pip install playwright && playwright install chromium`, ffmpeg.
 
@@ -72,6 +72,18 @@ def record(video_dir: Path) -> Path:
         return video
 
 
+def gif(mp4: Path, out: Path, fps: int, seconds: float | None = None) -> None:
+    duration = ["-t", str(seconds)] if seconds else []
+    subprocess.run(
+        ["ffmpeg", "-v", "error", "-y", *duration, "-i", str(mp4),
+         "-vf", f"fps={fps},scale=800:-1:flags=lanczos,split[a][b];"
+                "[a]palettegen=max_colors=96:stats_mode=diff[p];"
+                "[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle",
+         str(out)],
+        check=True,
+    )
+
+
 def encode(webm: Path) -> None:
     MEDIA.mkdir(exist_ok=True)
     mp4 = MEDIA / "demo.mp4"
@@ -81,14 +93,10 @@ def encode(webm: Path) -> None:
          "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(mp4)],
         check=True,
     )
-    subprocess.run(
-        ["ffmpeg", "-v", "error", "-y", "-t", str(GIF_SECONDS), "-i", str(mp4),
-         "-vf", "fps=12,scale=800:-1:flags=lanczos,split[a][b];"
-                "[a]palettegen=max_colors=96:stats_mode=diff[p];"
-                "[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle",
-         str(MEDIA / "demo.gif")],
-        check=True,
-    )
+    # GitHub READMEs cannot play a video stored in the repository, so the
+    # full walkthrough is also shipped as a GIF.
+    gif(mp4, MEDIA / "demo.gif", fps=12, seconds=GIF_SECONDS)
+    gif(mp4, MEDIA / "demo-full.gif", fps=10)
 
 
 if __name__ == "__main__":
@@ -97,4 +105,4 @@ if __name__ == "__main__":
         encode(record(tmp))
     finally:
         shutil.rmtree(tmp)
-    print(f"Wrote {MEDIA / 'demo.mp4'} and {MEDIA / 'demo.gif'}")
+    print(f"Wrote demo.mp4, demo.gif and demo-full.gif to {MEDIA}")

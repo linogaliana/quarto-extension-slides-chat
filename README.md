@@ -1,5 +1,12 @@
 # Slides Chat: a fake AI chat for Quarto revealjs
 
+[![Quarto extension](https://img.shields.io/badge/Quarto-%E2%89%A5%201.4-75AADB?logo=quarto&logoColor=white&labelColor=1a1b26)](https://quarto.org/docs/extensions/)
+[![revealjs plugin](https://img.shields.io/badge/revealjs-plugin-d97757?logo=revealdotjs&logoColor=white&labelColor=1a1b26)](https://quarto.org/docs/presentations/revealjs/)
+[![Version](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Flinogaliana%2Fquarto-extension-slides-chat%2Fmain%2F_extensions%2Fslides-chat%2F_extension.yml&query=%24.version&label=version&color=50abf1&labelColor=1a1b26)](_extensions/slides-chat/_extension.yml)
+[![Publish example slides](https://github.com/linogaliana/quarto-extension-slides-chat/actions/workflows/publish.yml/badge.svg)](https://github.com/linogaliana/quarto-extension-slides-chat/actions/workflows/publish.yml)
+[![Live demo](https://img.shields.io/badge/%E2%96%B6%20demo-live%20slides-50abf1?labelColor=1a1b26)](https://linogaliana.github.io/quarto-extension-slides-chat/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-9ece6a?labelColor=1a1b26)](LICENSE)
+
 This Quarto extension shows a conversation with an AI inside a `revealjs` presentation,
 styled like a command-line agent:
 
@@ -10,7 +17,14 @@ styled like a command-line agent:
 
 ![Demo of slides-chat](media/demo.gif)
 
-A [longer video](media/demo.mp4) walks through every example slide.
+<details>
+<summary>▶ Full walkthrough of every example slide (1 min 40)</summary>
+
+![Full walkthrough of the example slides](media/demo-full.gif)
+
+Also available as a [video](media/demo.mp4).
+
+</details>
 
 ## Installation
 
