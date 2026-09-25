@@ -3,6 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+.vscode/
+
+
 # C extensions
 *.so
 
@@ -216,3 +219,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Quarto
+/.quarto/
+*_files/
+example.html

@@ -1,0 +1,341 @@
+---
+title: "slides-chat"
+subtitle: "A fake AI chat for your Quarto presentations"
+author: Lino Galiana
+format:
+  revealjs:
+    css: assets/example.css
+    slide-number: true
+title-slide-attributes:
+  data-background-color: "#1a1b26"
+revealjs-plugins:
+  - slides-chat
+slides-chat:
+  user: Lino
+  assistant: CodeBot
+  logo: assets/logo.svg
+  color: "#50abf1"
+---
+
+## Meet CodeBot
+
+:::: {.slides-chat}
+
+::: {.assistant .fragment .typing}
+Hi, I'm **CodeBot**. I can help you write code.
+:::
+
+::: {.user .fragment .typing}
+I have a novel in `novel.txt`. I'd like to know which words come up most often.
+:::
+
+::: {.assistant .fragment .typing}
+Good idea! Split the text into words, then count them.
+:::
+
+::: {.user .fragment}
+Can you show me?
+:::
+
+::: {.assistant .fragment .typing}
+Here is a [`Python`](https://www.python.org/) script that only uses the standard library:
+
+```python
+from collections import Counter
+import re
+
+# Read the text, all lowercase
+with open("novel.txt", encoding="utf-8") as f:
+    text = f.read().lower()
+
+words = re.findall(r"\w+", text)
+counts = Counter(w for w in words if len(w) > 3)
+
+for word, n in counts.most_common(5):
+    print(f"{word:<12} {n}")
+```
+
+**Want me to draw a chart?**
+:::
+
+::::
+
+## Installation
+
+In your Quarto project, run:
+
+```bash
+quarto add linogaliana/quarto-extension-slides-chat
+```
+
+This adds the extension to `_extensions/slides-chat/`. Commit that folder along with your project.
+
+Then turn the plugin on in the presentation's YAML header:
+
+```yaml
+format: revealjs
+revealjs-plugins:
+  - slides-chat
+slides-chat:              # optional, deck-wide settings
+  user: Lino
+  assistant: CodeBot
+```
+
+## Writing a chat
+
+:::: {.columns}
+
+::: {.column width="55%" .source-code}
+````markdown
+:::: {.slides-chat}
+
+::: {.user}
+What is 6 × 7?
+:::
+
+::: {.assistant .fragment .typing}
+**42**, of course.
+:::
+
+::::
+````
+
+- `.user` / `.assistant` pick the speaker
+- `.fragment` shows a message on the next step
+- `.typing` shows dots first, then the text
+:::
+
+::: {.column width="45%"}
+:::: {.slides-chat}
+
+::: {.user}
+What is 6 × 7?
+:::
+
+::: {.assistant .fragment .typing}
+**42**, of course.
+:::
+
+::::
+:::
+
+::::
+
+## Options {.options-table}
+
+Set them deck-wide under `slides-chat:` in the YAML header, or on a single chat as attributes:
+`:::: {.slides-chat assistant="Bot" color="#9ece6a"}`
+
+| Option | Default | Effect |
+|---|---|---|
+| `user` | *(none)* | Name shown above the person's messages |
+| `assistant` | `Assistant` | Name of the AI |
+| `logo` | orange asterisk | Blinking avatar of the AI (path or URL) |
+| `color` | `#d97757` | AI colour: name, banner, typing dots |
+| `welcome` | `✱  <assistant>` | Welcome banner text, `false` to hide it |
+| `background` | `#1a1b26` | Background of slides holding a chat, `false` to keep the theme's |
+
+A single message can also take its own name: `::: {.user name="Alice"}`.
+
+## Names
+
+:::: {.slides-chat assistant="HelpBot" welcome="✱  HelpBot · team channel"}
+
+::: {.user name="Alice"}
+Our CI has been failing since this morning.
+:::
+
+::: {.user name="Bob" .fragment}
+Same here, the tests time out.
+:::
+
+::: {.assistant .fragment .typing}
+The test job now downloads a 2 GB dataset on every run. Cache it between runs:
+
+```yaml
+- uses: actions/cache@v4
+  with:
+    path: data/
+    key: dataset-v1
+```
+:::
+
+::: {.user name="Alice" .fragment}
+Thanks, that did it!
+:::
+
+::::
+
+## Colour and logo
+
+:::: {.slides-chat assistant="RoboHelper" logo="assets/robot.svg" color="#9ece6a"}
+
+::: {.user}
+Can you change your look?
+:::
+
+::: {.assistant .fragment .typing}
+Sure. On this chat I use two attributes:
+
+* `logo="assets/robot.svg"` for my avatar;
+* `color="#9ece6a"` for my name, the banner and the typing dots.
+:::
+
+::: {.assistant .fragment .typing}
+My avatar blinks while I think and while I type.
+:::
+
+::::
+
+## Welcome banner
+
+:::: {.columns}
+
+::: {.column width="50%"}
+:::: {.slides-chat welcome="✱  CodeBot v2.0 ready"}
+
+::: {.user}
+`welcome="..."`
+:::
+
+::: {.assistant .fragment .typing}
+A custom banner text.
+:::
+
+::::
+:::
+
+::: {.column width="50%"}
+:::: {.slides-chat welcome="false"}
+
+::: {.user}
+`welcome="false"`
+:::
+
+::: {.assistant .fragment .typing}
+No banner at all.
+:::
+
+::::
+:::
+
+::::
+
+## Slide background {background-color="#2b1d3a"}
+
+:::: {.slides-chat}
+
+::: {.user}
+Why is this slide purple?
+:::
+
+::: {.assistant .fragment .typing}
+The slide sets its own `background-color="#2b1d3a"`. The extension only adds a dark background when the slide has none.
+:::
+
+::: {.assistant .fragment .typing}
+To change the default for every chat slide, set `background:` in the YAML header.
+:::
+
+::::
+
+## No slide background
+
+:::: {.slides-chat background="false"}
+
+::: {.user}
+And here?
+:::
+
+::: {.assistant .fragment .typing}
+With `background="false"`, the slide keeps the theme's background. The chat stays a dark card on the page.
+:::
+
+::::
+
+## Theming with CSS variables
+
+:::: {.slides-chat .solar assistant="Solar" background="#fdf6e3" color="#268bd2" style="--slides-chat-bg: #fdf6e3; --slides-chat-code: #eee8d5; --slides-chat-border: #d9cfb3; --slides-chat-bright: #073642; --slides-chat-fg: #586e75; --slides-chat-dim: #93a1a1; --slides-chat-code-ink: #073642; --slides-chat-inline: #cb4b16; --slides-chat-prompt: #cb4b16;"}
+
+::: {.user}
+Can you do a light theme?
+:::
+
+::: {.assistant .fragment .typing}
+Every colour is a CSS variable. Redefine them on `.slides-chat` in your own stylesheet:
+
+```css
+.slides-chat {
+  --slides-chat-bg: #fdf6e3;
+  --slides-chat-bright: #073642;
+  --slides-chat-prompt: #cb4b16;
+}
+```
+:::
+
+::::
+
+## Pacing
+
+:::: {.slides-chat}
+
+::: {.user}
+No `.fragment`: I'm visible right away.
+:::
+
+::: {.user .fragment}
+`.fragment` alone: I appear in one piece.
+:::
+
+::: {.user .fragment .typing}
+`.fragment .typing` on a person: dots, then the whole text.
+:::
+
+::: {.assistant .fragment}
+`.fragment` alone on the AI: I appear in one piece too.
+:::
+
+::: {.assistant .fragment .typing}
+`.fragment .typing` on the AI: dots, then my answer streams in word by word. Step back and it rewinds.
+:::
+
+::::
+
+## Rich content
+
+:::: {.slides-chat}
+
+::: {.user}
+What can go inside a message?
+:::
+
+::: {.assistant .fragment .typing}
+Any Markdown:
+
+* **bold**, *italics*, `inline code` and [links](https://quarto.org);
+* lists and tables:
+
+| Language | Typed | First release |
+|----------|-------|--------------:|
+| Python   | no    | 1991          |
+| R        | no    | 1993          |
+| Rust     | yes   | 2015          |
+
+Code blocks and tables fade in whole, while the prose streams in.
+:::
+
+::::
+
+## Credit and inspiration
+
+The initial inspiration for `slides-chat` is
+[chat-bubbles](https://github.com/EmilHvitfeldt/quarto-revealjs-chat-bubbles)
+by Emil Hvitfeldt, which fakes iMessage, Slack, Discord and Teams conversations in revealjs slides.
+
+`slides-chat` builds on its foundations (message layout, typing dots, auto-scroll)
+and specialises them for conversations with an AI.
+
+::: {.callout-warning}
+This example slidedeck and extension have mostly been AI generated
+:::
+

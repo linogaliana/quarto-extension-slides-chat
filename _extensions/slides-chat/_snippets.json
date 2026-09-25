@@ -1,0 +1,37 @@
+{
+  "Slides Chat": {
+    "prefix": "slides-chat",
+    "body": [
+      ":::: {.slides-chat}",
+      "",
+      "::: {.user}",
+      "${1:Question}",
+      ":::",
+      "",
+      "::: {.assistant .fragment .typing}",
+      "${2:Réponse}",
+      ":::",
+      "",
+      "::::"
+    ],
+    "description": "Insère une conversation avec une IA."
+  },
+  "Slides Chat : message utilisateur": {
+    "prefix": "slides-chat-user",
+    "body": [
+      "::: {.user .fragment}",
+      "${1:Message}",
+      ":::"
+    ],
+    "description": "Insère un message de la personne."
+  },
+  "Slides Chat : réponse de l'IA": {
+    "prefix": "slides-chat-assistant",
+    "body": [
+      "::: {.assistant .fragment .typing}",
+      "${1:Réponse}",
+      ":::"
+    ],
+    "description": "Insère une réponse de l'IA qui s'écrit mot à mot."
+  }
+}

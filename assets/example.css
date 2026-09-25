@@ -1,0 +1,119 @@
+/* Styles for the example deck only — not part of the extension. */
+
+/* --- Title slide: a terminal session --- */
+.reveal #title-slide {
+  text-align: left;
+  font-family: "SF Mono", "Cascadia Code", "Fira Code", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+
+.reveal #title-slide .title {
+  color: #e0e6ff;
+  font-family: inherit;
+  font-size: 2.4em;
+}
+
+.reveal #title-slide .title::before {
+  content: "> ";
+  color: #d97757;
+}
+
+.reveal #title-slide .title::after {
+  content: "";
+  display: inline-block;
+  width: 0.5em;
+  height: 0.9em;
+  margin-left: 0.15em;
+  vertical-align: -0.05em;
+  background: #50abf1;
+  animation: title-cursor 1.1s steps(1) infinite;
+}
+
+@keyframes title-cursor {
+  50% { opacity: 0; }
+}
+
+.reveal #title-slide .subtitle {
+  color: #50abf1;
+  font-family: inherit;
+  font-size: 1.05em;
+}
+
+.reveal #title-slide .quarto-title-authors {
+  justify-content: flex-start;
+}
+
+.reveal #title-slide .quarto-title-author {
+  padding-left: 0;
+}
+
+.reveal #title-slide .quarto-title-author-name,
+.reveal #title-slide .date {
+  color: #565f89;
+  font-family: inherit;
+  font-size: 0.8em;
+}
+
+.reveal #title-slide::after {
+  content: "";
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  width: 180px;
+  height: 180px;
+  transform: translateY(-50%);
+  background: url("logo.svg") no-repeat center / contain;
+  opacity: 0.9;
+}
+
+/* --- Side-by-side slides: give each chat a fixed height --- */
+.reveal .columns .slides-chat {
+  height: 500px;
+}
+
+.reveal .source-code div.sourceCode,
+.reveal .source-code pre {
+  background: #16161e;
+  border: 1px solid #3b3d57;
+  border-radius: 6px;
+}
+
+.reveal .source-code pre code {
+  font-size: 1em;
+  line-height: 1.35;
+}
+
+.reveal .source-code pre code,
+.reveal .source-code pre code span {
+  color: #c8d3f5;
+}
+
+.reveal .source-code li {
+  font-size: 0.7em;
+}
+
+.reveal .source-code li code {
+  color: #ff9e64;
+}
+
+/* --- Reference slides --- */
+.reveal .options-table p {
+  font-size: 0.8em;
+}
+
+.reveal .options-table table {
+  font-size: 0.55em;
+}
+
+/* --- Light "Solar" chat: syntax colours that read on a pale surface --- */
+.reveal .slides-chat.solar .bubble-text pre code span { color: #073642; }
+.reveal .slides-chat.solar .bubble-text pre .at,
+.reveal .slides-chat.solar .bubble-text pre .dt { color: #859900; }
+.reveal .slides-chat.solar .bubble-text pre .dv,
+.reveal .slides-chat.solar .bubble-text pre .st { color: #2aa198; }
+.reveal .slides-chat.solar .bubble-text pre .fu,
+.reveal .slides-chat.solar .bubble-text pre .kw { color: #268bd2; }
+.reveal .slides-chat.solar .bubble-text pre a { color: #93a1a1; }
+
+.reveal .options-table td:first-child code {
+  white-space: nowrap;
+}

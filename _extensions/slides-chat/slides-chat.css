@@ -1,0 +1,403 @@
+/* ==========================================================================
+   Slides Chat
+
+   Un transcript de terminal sombre en police monospace : une seule colonne,
+   les messages de la personne en lignes `>` dans un cadre de saisie, ceux de
+   l'IA précédés d'un petit logo qui clignote pendant qu'elle « réfléchit »
+   puis écrit.
+
+   slides-chat.js normalise le balisage en attributs ciblés ci-dessous :
+     .slides-chat           le conteneur ([data-banner] pour la bannière)
+     [data-role]        "user" ou "assistant" sur chaque message
+     [data-continues]   message consécutif du même interlocuteur
+
+   Personnalisation : toutes les couleurs sont des variables --slides-chat-*,
+   redéfinissables sur .slides-chat (ou via les options YAML logo / color).
+
+   Dérivé de chat-bubbles (Emil Hvitfeldt), thème claude-code.
+   ========================================================================== */
+
+.slides-chat {
+  --slides-chat-bg:        #1a1b26;
+  --slides-chat-surface:   #1e1f2e;
+  --slides-chat-code:      #16161e;
+  --slides-chat-fg:        #c0caf5;
+  --slides-chat-dim:       #565f89;
+  --slides-chat-bright:    #e0e6ff;
+  --slides-chat-prompt:    #d97757; /* `>` de l'invite */
+  --slides-chat-assistant: #d97757; /* nom, bannière et points de l'IA */
+  --slides-chat-link:      #7aa2f7;
+  --slides-chat-border:    #3b3d57;
+  --slides-chat-code-ink:  #c8d3f5;
+  --slides-chat-inline:    #ff9e64; /* `code` en ligne */
+
+  /* Avatar clignotant de l'IA ; remplacé par l'option `logo`. */
+  --slides-chat-logo: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGcgc3Ryb2tlPSIjZDk3NzU3IiBzdHJva2Utd2lkdGg9IjMuNiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48cGF0aCBkPSJNMTYgM3YyNk0zIDE2aDI2TTYuOCA2LjhsMTguNCAxOC40TTI1LjIgNi44TDYuOCAyNS4yIi8+PC9nPjwvc3ZnPg==");
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.7rem;
+  padding: 1rem 1.3rem 1.2rem;
+  overflow-y: scroll;
+  max-height: 100%;
+  position: relative;
+  scrollbar-width: none;
+
+  background: var(--slides-chat-bg);
+  border-radius: 8px;
+  color: var(--slides-chat-fg);
+  font-family: "SF Mono", "Cascadia Code", "Fira Code", "JetBrains Mono", "Menlo", Consolas, monospace;
+  font-size: 0.78em;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.slides-chat::-webkit-scrollbar {
+  display: none;
+}
+
+.slides-chat.is-scrolled {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 80px);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 80px);
+}
+
+/* Trailing space so the newest message can scroll clear of the bottom edge */
+.slides-chat::after {
+  content: '';
+  display: block;
+  min-height: 150px;
+  flex-shrink: 0;
+}
+
+/* Bannière d'accueil, comme le cadre qu'affiche un agent CLI au démarrage. */
+.slides-chat[data-banner]::before {
+  content: attr(data-banner);
+  display: block;
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+  padding: 0.6em 0.9em;
+  border: 1px solid var(--slides-chat-assistant);
+  border-radius: 6px;
+  color: var(--slides-chat-assistant);
+  font-size: 0.92em;
+  white-space: pre;
+}
+
+/* ==========================================================================
+   Messages
+   ========================================================================== */
+
+.slides-chat [data-role] {
+  position: relative;
+  word-wrap: break-word;
+  display: grid;
+  grid-template-columns: 1.3em minmax(0, 1fr);
+  grid-template-areas:
+    "marker name"
+    "marker text";
+  column-gap: 0.4em;
+  align-self: stretch;
+  max-width: 100%;
+}
+
+/* Colonne de gauche : `>` pour la personne, logo clignotant pour l'IA. */
+.slides-chat [data-role="user"]::before {
+  content: ">";
+  grid-area: marker;
+  color: var(--slides-chat-prompt);
+  font-weight: 700;
+}
+
+.slides-chat .bubble-avatar {
+  display: none;
+}
+
+.slides-chat [data-role="assistant"] .bubble-avatar {
+  display: block;
+  grid-area: marker;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 0.1em;
+  background-image: var(--slides-chat-logo);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  user-select: none;
+}
+
+@keyframes slides-chat-logo-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.15; }
+}
+
+/* Clignote pendant l'attente de la réponse et pendant qu'elle s'écrit */
+.slides-chat [data-role="assistant"].is-typing:not(.text-revealed) .bubble-avatar,
+.slides-chat [data-role="assistant"].is-streaming .bubble-avatar {
+  animation: slides-chat-logo-blink 1s ease-in-out infinite;
+}
+
+.slides-chat .bubble-name {
+  display: block;
+  grid-area: name;
+  margin-bottom: 0.15em;
+  font-size: 0.85em;
+  color: var(--slides-chat-dim);
+}
+
+.slides-chat .bubble-name:empty {
+  display: none;
+}
+
+.slides-chat [data-role="assistant"] .bubble-name {
+  color: var(--slides-chat-assistant);
+}
+
+.slides-chat .bubble-text {
+  grid-area: text;
+  color: var(--slides-chat-bright);
+}
+
+/* Le message de la personne est dans un cadre de saisie, comme l'invite CLI */
+.slides-chat [data-role="user"] {
+  padding: 0.5em 0.7em;
+  border: 1px solid var(--slides-chat-border);
+  border-radius: 6px;
+}
+
+.slides-chat [data-role="user"] .bubble-text {
+  color: var(--slides-chat-bright);
+}
+
+/* Messages consécutifs du même interlocuteur : pas de nom, écart resserré */
+.slides-chat [data-continues] {
+  margin-top: -0.35rem;
+}
+
+.slides-chat [data-continues] .bubble-name {
+  display: none;
+}
+
+/* Images, cellules Quarto */
+.slides-chat [data-role] img {
+  display: block;
+  max-width: 100%;
+  border-radius: 0.6em;
+}
+
+.slides-chat [data-role] p:only-child,
+.slides-chat [data-role] .cell,
+.slides-chat [data-role] .cell-output-display,
+.slides-chat [data-role] figure {
+  margin: 0;
+  padding: 0;
+}
+
+/* ==========================================================================
+   Contenu
+   ========================================================================== */
+
+.slides-chat .bubble-text p {
+  margin: 0.35em 0;
+}
+
+.slides-chat .bubble-text p:first-child { margin-top: 0; }
+.slides-chat .bubble-text p:last-child  { margin-bottom: 0; }
+
+.slides-chat .bubble-text a {
+  color: var(--slides-chat-link);
+  text-decoration: underline;
+}
+
+.slides-chat .bubble-text strong {
+  color: var(--slides-chat-bright);
+}
+
+.slides-chat .bubble-text ul,
+.slides-chat .bubble-text ol {
+  margin: 0.35em 0;
+  padding-left: 1.4em;
+}
+
+/* Code en ligne — le préfixe `.reveal` et la couleur explicite battent les
+   règles `section.has-dark-background code` / `.reveal code` du thème Quarto,
+   qui sinon laissent du sombre sur sombre. */
+.reveal .slides-chat .bubble-text code,
+.reveal .slides-chat .bubble-text a code {
+  background: color-mix(in srgb, var(--slides-chat-inline) 15%, transparent);
+  color: var(--slides-chat-inline);
+  padding: 0.05em 0.35em;
+  border-radius: 3px;
+  font-size: 0.92em;
+}
+
+.reveal .slides-chat .bubble-text a:has(code) {
+  text-decoration-color: color-mix(in srgb, var(--slides-chat-inline) 55%, transparent);
+}
+
+.slides-chat .bubble-text div.sourceCode {
+  margin: 0.5em 0;
+  background: transparent;
+}
+
+.reveal .slides-chat .bubble-text pre {
+  width: 100%;
+  margin: 0.5em 0;
+  padding: 0.7em 0.9em;
+  background: var(--slides-chat-code);
+  border: 1px solid var(--slides-chat-border);
+  border-radius: 6px;
+  box-shadow: none;
+  overflow-x: auto;
+  font-size: 0.82em;
+}
+
+.reveal .slides-chat .bubble-text pre code,
+.reveal .slides-chat .bubble-text pre.sourceCode code {
+  background: none;
+  padding: 0;
+  color: var(--slides-chat-code-ink);
+}
+
+/* Tokens non classés (identifiants…) : le bleu marine par défaut de Quarto
+   disparaît sur le fond sombre. */
+.reveal .slides-chat .bubble-text pre code span {
+  color: var(--slides-chat-code-ink);
+}
+
+.reveal .slides-chat .bubble-text pre a {
+  color: var(--slides-chat-dim);
+  text-decoration: none;
+}
+
+/* Coloration syntaxique retouchée pour le fond sombre (façon tokyo-night) */
+.reveal .slides-chat .bubble-text pre .co { color: #565f89; font-style: italic; }
+.reveal .slides-chat .bubble-text pre .kw,
+.reveal .slides-chat .bubble-text pre .cf { color: #bb9af7; }
+.reveal .slides-chat .bubble-text pre .fu,
+.reveal .slides-chat .bubble-text pre .im { color: #7aa2f7; }
+.reveal .slides-chat .bubble-text pre .st,
+.reveal .slides-chat .bubble-text pre .sc,
+.reveal .slides-chat .bubble-text pre .ch,
+.reveal .slides-chat .bubble-text pre .ss,
+.reveal .slides-chat .bubble-text pre .at,
+.reveal .slides-chat .bubble-text pre .vs { color: #9ece6a; }
+.reveal .slides-chat .bubble-text pre .dv,
+.reveal .slides-chat .bubble-text pre .bn,
+.reveal .slides-chat .bubble-text pre .fl { color: #ff9e64; }
+.reveal .slides-chat .bubble-text pre .op { color: #89ddff; }
+.reveal .slides-chat .bubble-text pre .dt,
+.reveal .slides-chat .bubble-text pre .va,
+.reveal .slides-chat .bubble-text pre .cn { color: #e0af68; }
+
+/* ==========================================================================
+   Animations
+   ========================================================================== */
+
+/* Apparition des messages (fragments) */
+.reveal .slides section .slides-chat .fragment[data-role] {
+  opacity: 0;
+  visibility: visible;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.reveal .slides section .slides-chat .fragment[data-role].visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Indicateur « en train d'écrire » */
+@keyframes slides-chat-typing-dot {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+}
+
+.slides-chat .typing-indicator {
+  display: flex;
+  grid-area: text;
+  gap: 0.3em;
+  align-items: center;
+  padding: 0.15em 0;
+}
+
+.slides-chat .typing-indicator span {
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: var(--slides-chat-assistant);
+  opacity: 0.7;
+  animation: slides-chat-typing-dot 1.2s infinite ease-in-out;
+}
+
+.slides-chat [data-role="user"] .typing-indicator span {
+  background: var(--slides-chat-dim);
+}
+
+.slides-chat .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.slides-chat .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+.slides-chat .is-typing .bubble-text { display: none; }
+.slides-chat .is-typing.text-revealed .bubble-text { display: block; }
+.slides-chat .is-typing.text-revealed .typing-indicator { display: none; }
+
+/* Machine à écrire : le texte arrive mot à mot, les blocs en fondu */
+.slides-chat .tw-word.tw-pending,
+.slides-chat .tw-block.tw-pending {
+  display: none;
+}
+
+.slides-chat .tw-word {
+  animation: slides-chat-word-in 0.24s ease both;
+}
+
+.slides-chat .tw-block {
+  animation: slides-chat-block-in 0.3s ease both;
+}
+
+/* Un paragraphe / élément de liste dont tous les mots sont encore en attente
+   ne prend pas de place avant l'arrivée de son premier mot. */
+.slides-chat .bubble-text p:has(.tw-word):not(:has(.tw-word:not(.tw-pending))),
+.slides-chat .bubble-text li:has(.tw-word):not(:has(.tw-word:not(.tw-pending))),
+.slides-chat .bubble-text a:has(.tw-word):not(:has(.tw-word:not(.tw-pending))) {
+  display: none;
+}
+
+@keyframes slides-chat-word-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slides-chat-block-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slides-chat [data-role="assistant"] .bubble-avatar,
+  .slides-chat .tw-word,
+  .slides-chat .tw-block {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Slide contenant un chat : titre, texte et pied de page lisibles sur le
+   fond sombre posé par l'option `background`.
+   ========================================================================== */
+
+.reveal .slides section.slides-chat-slide.has-dark-background h2 {
+  color: #e0e6ff;
+}
+
+.reveal .slides section.slides-chat-slide.has-dark-background,
+.reveal .slides section.slides-chat-slide.has-dark-background p,
+.reveal .slides section.slides-chat-slide.has-dark-background li {
+  color: #c0caf5;
+}
+
+.reveal:has(section.present.slides-chat-slide.has-dark-background) .footer,
+.reveal:has(section.present.slides-chat-slide.has-dark-background) .slide-number {
+  color: #c0caf5;
+}

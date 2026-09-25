@@ -1,0 +1,35 @@
+$schema: https://m.canouil.dev/quarto-wizard/assets/schema/v1/extension-schema.json
+
+options:
+  slides-chat:
+    type: object
+    description: "Options du faux chat d'IA pour toute la présentation. Chacune peut être surchargée par un attribut du même nom sur un div .slides-chat."
+    properties:
+      user:
+        type: string
+        description: "Nom affiché pour la personne qui écrit."
+      assistant:
+        type: string
+        description: "Nom affiché pour l'IA (défaut : Assistant)."
+      logo:
+        type: string
+        description: "Chemin ou URL de l'image utilisée comme avatar clignotant de l'IA."
+      color:
+        type: string
+        description: "Couleur de l'IA : nom, bannière d'accueil, points de saisie."
+      welcome:
+        type: [string, boolean]
+        description: "Texte de la bannière d'accueil (défaut : ✱ + nom de l'IA). false pour la masquer."
+      background:
+        type: [string, boolean]
+        description: "Couleur de fond des slides contenant un chat (défaut : #1a1b26). false pour ne pas y toucher."
+
+classes:
+  slides-chat:
+    description: "Conteneur de la conversation. Attributs optionnels : user, assistant, logo, color, welcome, background."
+  user:
+    description: "Message de la personne (ligne `>` dans un cadre de saisie)."
+  assistant:
+    description: "Message de l'IA, précédé de son logo."
+  typing:
+    description: "Affiche d'abord des points de saisie, puis le texte à l'étape suivante (mot à mot pour l'IA). À combiner avec .fragment."

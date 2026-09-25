@@ -1,0 +1,21 @@
+title: Slides Chat
+author: Lino Galiana
+version: 0.1.0
+quarto-required: ">=1.4.0"
+contributes:
+  revealjs-plugins:
+    - name: RevealSlidesChat
+      script:
+        - slides-chat.js
+      stylesheet:
+        - slides-chat.css
+      # Valeurs par défaut, surchargeables par un bloc `slides-chat:` dans le YAML
+      # du document (Quarto convertit `slidesChat` <-> `slides-chat`).
+      config:
+        slidesChat:
+          user: ""
+          assistant: "Assistant"
+          logo: ""
+          color: ""
+          welcome: ""
+          background: "#1a1b26"
