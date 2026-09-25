@@ -59,7 +59,8 @@ print("Hello!")
 | `.fragment` | The message appears on the next step (otherwise it is visible right away) |
 | `.typing` | Typing dots first, then the text on the next step (word by word for the AI) |
 
-See [example.qmd](example.qmd) for a full example.
+See [example.qmd](example.qmd) for a full example, and the
+[rendered slides](https://linogaliana.github.io/quarto-extension-slides-chat/) to see it in action.
 
 ## Options
 

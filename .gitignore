@@ -224,3 +224,4 @@ __marimo__/
 /.quarto/
 *_files/
 example.html
+/_site/
