@@ -7,13 +7,7 @@
 [![Live demo](https://img.shields.io/badge/%E2%96%B6%20demo-live%20slides-50abf1?labelColor=1a1b26)](https://linogaliana.github.io/quarto-extension-slides-chat/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-9ece6a?labelColor=1a1b26)](LICENSE)
 
-This Quarto extension shows a conversation with an AI inside a `revealjs` presentation,
-styled like a command-line agent:
-
-- a dark terminal with a monospace font;
-- the person's messages are `>` prompt lines inside an input box;
-- the AI "thinks" (typing dots, blinking logo), then its answer streams in word by word, while code blocks and images fade in;
-- every message is a fragment, so you step forward and back with the arrow keys.
+This Quarto extension mimics a conversation with an AI inside a `revealjs` presentation, styled like a command-line agent:
 
 ![Demo of slides-chat](media/demo.gif)
 
@@ -25,6 +19,14 @@ styled like a command-line agent:
 Also available as a [video](media/demo.mp4).
 
 </details>
+
+Several styles are available to reproduce different settings. 
+
+If you want to see real examples: 
+
+* Extension documentation is deployed as a slideck example [here](https://linogaliana.github.io/quarto-extension-slides-chat/#/title-slide)
+* See a presentation [here](https://linogaliana.github.io/geodatadays-atelier-parquet/) that mimics `ParquetGPT`, a fake Parquet specialized AI. 
+
 
 ## Installation
 
@@ -82,8 +84,7 @@ See [example.qmd](example.qmd) for a full example, and the
 
 ## Options
 
-Set options for the whole presentation in the `slides-chat:` YAML block, or for a single chat
-with an attribute of the same name: `:::: {.slides-chat assistant="Bot" welcome="false"}`.
+Set options for the whole presentation in the `slides-chat:` YAML block, or for a single chat with an attribute of the same name: `:::: {.slides-chat assistant="Bot" welcome="false"}`.
 
 | Option | Default | Description |
 |---|---|---|
@@ -111,8 +112,6 @@ presentation's stylesheet:
 ## Credits
 
 The initial inspiration for this extension is
-[chat-bubbles](https://github.com/EmilHvitfeldt/quarto-revealjs-chat-bubbles) by Emil Hvitfeldt,
-which fakes iMessage, Slack, Discord and Teams conversations in revealjs slides.
-`slides-chat` builds on its foundations (message layout, typing dots, auto-scroll) and
-specialises them for conversations with an AI: word-by-word streaming, blinking avatar,
-welcome banner and YAML options.
+[chat-bubbles](https://github.com/EmilHvitfeldt/quarto-revealjs-chat-bubbles) by Emil Hvitfeldt, which fakes iMessage, Slack, Discord and Teams conversations in revealjs slides.
+
+`slides-chat` builds on its foundations (message layout, typing dots, auto-scroll) and specialises them for conversations with an AI: word-by-word streaming, blinking avatar, welcome banner and YAML options.
